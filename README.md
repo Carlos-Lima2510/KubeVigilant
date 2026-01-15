@@ -8,11 +8,7 @@
 
 **KubeVigilant** es una herramienta de observabilidad que se conecta a tu clúster local (MicroK8s/Minikube) y vigila continuamente el ciclo de vida de los Pods. Su objetivo principal es la detección proactiva del temido estado `CrashLoopBackOff`, alertando en consola mucho antes de que un humano revise el dashboard.
 
----
-
-## Diagrama de Interfaz Pública
-
-![Vista Pública](/documents/vistaPública.png)   
+[![Architecture](https://img.shields.io/badge/Architecture-View%20Public%20API-007EC6?style=for-the-badge&logo=uml&logoColor=white)](/documents/vistaPública.png) 
 
 ## 🚀 Características Principales
 
