@@ -4,33 +4,24 @@ import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.models.V1Pod;
 import io.kubernetes.client.util.Watch;
 import com.google.gson.reflect.TypeToken;
+import okhttp3.Call;
 
 public class EventWatcher {
     private final CoreV1Api api;
+    private final PodListener listener;
 
-    public EventWatcher(CoreV1Api api) {
+    public EventWatcher(CoreV1Api api, PodListener listener) {
         this.api = api;
+        this.listener = listener;
     }
 
-    public void start(PodListener listener) {
-        System.out.println("👀 Iniciando vigilancia continua... (Pulsa Ctrl+C para salir)");
+    public void start() {
+        System.out.println("Vigilancia Activa. Esperando Eventos...");
+
         try {
             Watch<V1Pod> watch = Watch.createWatch(
                 api.getApiClient(),
-                api.listPodForAllNamespacesCall(
-                    null, 
-                    null,
-                    null,
-                    null, 
-                    null, 
-                    null, 
-                    null, 
-                    null, 
-                    null,
-                    null, 
-                    Boolean.TRUE, 
-                    null
-                ),
+                createWatchCall(),
                 new TypeToken<Watch.Response<V1Pod>>(){}.getType()
             );
 
@@ -40,8 +31,15 @@ public class EventWatcher {
                 }
             }
         } catch (Exception e) {
-            System.err.println("Error en el Watcher: " + e.getMessage());
-            e.printStackTrace();
+            throw new RuntimeException("El Watcher ha fallado inesperadamente", e);
         }
+    }
+
+    private Call createWatchCall() throws Exception {
+        return api.listPodForAllNamespacesCall(
+            null, null, null, null, null, null, null, null, null, null,
+            Boolean.TRUE,
+            null
+        );
     }
 }

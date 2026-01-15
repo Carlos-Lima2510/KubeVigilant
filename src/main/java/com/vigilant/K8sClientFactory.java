@@ -5,16 +5,17 @@ import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.util.Config;
 import java.io.IOException;
 
-public class K8sConnection {
-    public static CoreV1Api connect() {
-        System.out.println("-> Intentando conectar con Maven...");
+public class K8sClientFactory {
+
+    public CoreV1Api createApi(){
         try {
             ApiClient client = Config.defaultClient();
             client.setReadTimeout(0);
+
             return new CoreV1Api(client);
+
         } catch (IOException e) {
-            e.printStackTrace();
-            return null;
+            throw new RuntimeException("Error fatal: No se pudo conectar al clúster Kubernetes.", e);
         }
     }
 }
