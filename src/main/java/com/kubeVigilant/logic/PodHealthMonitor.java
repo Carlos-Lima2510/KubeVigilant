@@ -1,25 +1,27 @@
-package com.vigilant;
+package com.kubeVigilant.logic;
 
 import io.kubernetes.client.openapi.models.V1Pod;
 import io.kubernetes.client.openapi.models.V1ContainerState;
 import io.kubernetes.client.openapi.models.V1ContainerStatus;
 import java.util.List;
 
+import com.kubeVigilant.watcher.PodListener;
+
 public class PodHealthMonitor implements PodListener {
 
     private static final String ERROR_REASON = "CrashLoopBackOff";
 
     public void onEvent(V1Pod pod, String eventType) {
-        if (pod == null || pod.getStatus() == null) {
-            return;
-        }
-
         if (isPodCrashing(pod)) {
             reportCrash(pod);
         }
     }
 
     private boolean isPodCrashing(V1Pod pod) {
+        if (pod.getStatus() == null || pod.getStatus().getContainerStatuses() == null) {
+            return false;
+        }
+
         List<V1ContainerStatus> statuses = pod.getStatus().getContainerStatuses();
         
         for (V1ContainerStatus status : statuses) {

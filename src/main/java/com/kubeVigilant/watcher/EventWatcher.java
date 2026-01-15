@@ -1,9 +1,10 @@
-package com.vigilant;
+package com.kubeVigilant.watcher;
 
 import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.models.V1Pod;
 import io.kubernetes.client.util.Watch;
 import com.google.gson.reflect.TypeToken;
+
 import okhttp3.Call;
 
 public class EventWatcher {

@@ -1,4 +1,4 @@
-package com.vigilant;
+package com.kubeVigilant.watcher;
 
 import io.kubernetes.client.openapi.models.V1Pod;
 

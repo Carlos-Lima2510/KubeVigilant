@@ -1,2 +1,13 @@
-.vscode
-.github
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+release.properties
+dependency-reduced-pom.xml
+
+*.class
+*.log
+*.ctxt
+
+.vscode/
+.github/

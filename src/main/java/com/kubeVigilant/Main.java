@@ -1,4 +1,8 @@
-package com.vigilant;
+package com.kubeVigilant;
+
+import com.kubeVigilant.core.K8sClientFactory;
+import com.kubeVigilant.logic.PodHealthMonitor;
+import com.kubeVigilant.watcher.EventWatcher;
 
 import io.kubernetes.client.openapi.apis.CoreV1Api;
 
