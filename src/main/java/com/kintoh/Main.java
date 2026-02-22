@@ -6,6 +6,7 @@ import com.kintoh.domain.Watcher;
 import com.kintoh.logic.NodeMonitor;
 import com.kintoh.logic.PodCrashMonitor;
 import com.kintoh.notifiers.ConsoleNotifier;
+import com.kintoh.notifiers.SlackNotifier;
 import com.kintoh.watcher.NodeWatcher;
 import com.kintoh.watcher.PodWatcher;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
@@ -15,7 +16,13 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) {
         CoreV1Api api = new K8sClientFactory().createApi();
-        List<Notifier> notifiers = List.of(new ConsoleNotifier());
+
+        String slackWebHook = System.getenv("SLACK_WEBHOOK_URL");
+
+
+        List<Notifier> notifiers = List.of(
+            new ConsoleNotifier(),
+            new SlackNotifier(slackWebHook));
 
         List<Watcher> watchers = List.of(
             new PodWatcher(api, new PodCrashMonitor(), notifiers),
