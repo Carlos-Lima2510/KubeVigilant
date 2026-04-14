@@ -18,8 +18,8 @@ public class ConsoleNotifier implements Notifier {
             System.out.println("\n--------------------------------------------------");
             System.out.println(" [" + event.severity() + "] DETECCIÓN DE ANOMALÍA ");
             System.out.println("    * Hora:     " + event.timestamp().format(FORMATTER));
-            System.out.println("    * Recurso:  " + event.resource().name());
-            System.out.println("    * Ámbito:   " + event.resource().namespace());
+            System.out.println("    * Recurso:  " + event.resourceName());
+            System.out.println("    * Ámbito:   " + event.resourceNamespace());
             System.out.println("    * Motivo:   " + event.reason());
             System.out.println("    * Detalles: " + detallesFormateados);
             System.out.println("--------------------------------------------------");

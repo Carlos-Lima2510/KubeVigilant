@@ -14,11 +14,13 @@ public abstract class AbstractK8sWatcher implements Watcher, Runnable {
         this.threadName = threadName;
     }
 
+    @Override
     public void start() {
         System.out.println("Arrancando vigilante: " + threadName + "...");
         new Thread(this, threadName).start();
     }
 
+    @Override
     public void stop() {
         running.set(false);
     }

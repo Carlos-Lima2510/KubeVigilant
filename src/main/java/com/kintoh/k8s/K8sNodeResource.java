@@ -16,14 +16,17 @@ public class K8sNodeResource implements Resource {
         this.node = node;
     }
 
+    @Override
     public String name() {
         return node.getMetadata() != null ? node.getMetadata().getName() : "Desconocido";
     }
 
+    @Override
     public String namespace() {
         return "cluster-scope";
     }
 
+    @Override
     public Optional<Anomaly> getCriticalAnomaly() {
         if (node.getStatus() == null || node.getStatus().getConditions() == null) {
             return Optional.empty();
@@ -33,13 +36,16 @@ public class K8sNodeResource implements Resource {
             if ("Ready".equals(condition.getType())) {
                 String status = condition.getStatus();
                 if ("False".equals(status) || "Unknown".equals(status)) {
+                    
                     return Optional.of(new Anomaly(
+                        "CRÍTICO", 
                         "NodeNotReady",
                         Map.of(
                             "estado_actual", status,
                             "razon_k8s", condition.getReason() != null ? condition.getReason() : "N/A"
                         )
                     ));
+                    
                 }
             }
         }

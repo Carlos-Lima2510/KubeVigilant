@@ -18,14 +18,17 @@ public class K8sPodResource implements Resource {
         this.pod = pod;
     }
 
+    @Override
     public String name() {
         return pod.getMetadata() != null ? pod.getMetadata().getName() : "Desconocido";
     }
 
+    @Override
     public String namespace() {
         return pod.getMetadata() != null ? pod.getMetadata().getNamespace() : "Desconocido";
     }
 
+    @Override
     public Optional<Anomaly> getCriticalAnomaly() {
         if (pod.getStatus() == null || pod.getStatus().getContainerStatuses() == null) {
             return Optional.empty();
@@ -42,8 +45,7 @@ public class K8sPodResource implements Resource {
                     "ErrImagePull".equals(reason) ||
                     "CreateContainerConfigError".equals(reason)) {
                     
-                    return Optional.of(new Anomaly(
-                        reason,
+                    return Optional.of(new Anomaly("CRÍTICO", reason,
                         Map.of("contenedor_afectado", status.getName())
                     ));
                 }
