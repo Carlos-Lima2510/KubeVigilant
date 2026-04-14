@@ -33,11 +33,20 @@ public class K8sPodResource implements Resource {
 
         for (V1ContainerStatus status : pod.getStatus().getContainerStatuses()) {
             V1ContainerState state = status.getState();
-            if (state != null && state.getWaiting() != null && "CrashLoopBackOff".equals(state.getWaiting().getReason())) {
-                return Optional.of(new Anomaly(
-                    "CrashLoopBackOff",
-                    Map.of("contenedor_afectado", status.getName())
-                ));
+            
+            if (state != null && state.getWaiting() != null) {
+                String reason = state.getWaiting().getReason();
+                
+                if ("CrashLoopBackOff".equals(reason) || 
+                    "ImagePullBackOff".equals(reason) || 
+                    "ErrImagePull".equals(reason) ||
+                    "CreateContainerConfigError".equals(reason)) {
+                    
+                    return Optional.of(new Anomaly(
+                        reason,
+                        Map.of("contenedor_afectado", status.getName())
+                    ));
+                }
             }
         }
         return Optional.empty();
