@@ -42,7 +42,7 @@ public class NodeWatcher extends AbstractK8sWatcher {
                         for (Notifier notifier : notifiers) {
                             boolean entregado = notifier.send(event);
                             if (!entregado) {
-                                System.err.println("⚠️ ERROR: El notificador " + notifier.getClass().getSimpleName() + " no pudo entregar la alerta.");
+                                System.err.println("ERROR: El notificador " + notifier.getClass().getSimpleName() + " no pudo entregar la alerta.");
                             }
                         }
                     });
