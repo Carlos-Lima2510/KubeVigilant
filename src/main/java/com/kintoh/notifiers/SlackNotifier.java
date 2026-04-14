@@ -27,7 +27,9 @@ public class SlackNotifier implements Notifier {
                 .map(e -> e.getKey() + ": " + e.getValue())
                 .collect(Collectors.joining(", "));
             
-            String mensaje = "🚨 ANOMALÍA: " + event.reason() + " en " + event.resource().name() + " | Info: " + detalles;
+            String recursoCompleto = event.resource().namespace() + "/" + event.resource().name();
+            
+            String mensaje = "🚨 ANOMALÍA: " + event.reason() + " en " + recursoCompleto + " | Info: " + detalles;
             String jsonPayload = "{ \"text\": \"" + mensaje + "\" }";
 
             HttpRequest request = HttpRequest.newBuilder()
