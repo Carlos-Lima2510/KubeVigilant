@@ -11,10 +11,7 @@ import java.util.Optional;
 
 public class NodeMonitor implements Monitor {
 
-    public Optional<Event> check(Resource resource) {
-        if (!(resource instanceof K8sNodeResource)) {
-            return Optional.empty();
-        }
+    public Optional<Event> check(K8sNodeResource resource) {
 
         V1Node node = ((K8sNodeResource) resource).rawNode();
 

@@ -11,15 +11,12 @@ import io.kubernetes.client.openapi.models.V1Pod;
 import java.util.List;
 import java.util.Optional;
 
-public class PodCrashMonitor implements Monitor {
+public class PodCrashMonitor implements Monitor<K8sPodResource> {
     private static final String ERROR_REASON = "CrashLoopBackOff";
 
-    public Optional<Event> check(Resource resource) {
-        if (!(resource instanceof K8sPodResource)) {
-            return Optional.empty();
-        }
-
-        V1Pod pod = ((K8sPodResource) resource).rawPod();
+    public Optional<Event> check(K8sPodResource resource) {
+        
+        V1Pod pod = resource.rawPod(); 
         
         if (pod.getStatus() == null || pod.getStatus().getContainerStatuses() == null) {
             return Optional.empty();
