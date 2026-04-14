@@ -1,8 +1,14 @@
 package com.kintoh.k8s;
 
 import com.kintoh.domain.Resource;
+import com.kintoh.domain.Anomaly;
 
 import io.kubernetes.client.openapi.models.V1Pod;
+import io.kubernetes.client.openapi.models.V1ContainerState;
+import io.kubernetes.client.openapi.models.V1ContainerStatus;
+
+import java.util.Optional;
+import java.util.Map;
 
 public class K8sPodResource implements Resource {
 
@@ -19,8 +25,30 @@ public class K8sPodResource implements Resource {
     public String namespace() {
         return pod.getMetadata() != null ? pod.getMetadata().getNamespace() : "Desconocido";
     }
-    
-    public V1Pod rawPod() {
-        return pod;
+
+    public Optional<Anomaly> getCriticalAnomaly() {
+        if (pod.getStatus() == null || pod.getStatus().getContainerStatuses() == null) {
+            return Optional.empty();
+        }
+
+        for (V1ContainerStatus status : pod.getStatus().getContainerStatuses()) {
+            V1ContainerState state = status.getState();
+            
+            if (state != null && state.getWaiting() != null) {
+                String reason = state.getWaiting().getReason();
+                
+                if ("CrashLoopBackOff".equals(reason) || 
+                    "ImagePullBackOff".equals(reason) || 
+                    "ErrImagePull".equals(reason) ||
+                    "CreateContainerConfigError".equals(reason)) {
+                    
+                    return Optional.of(new Anomaly(
+                        reason,
+                        Map.of("contenedor_afectado", status.getName())
+                    ));
+                }
+            }
+        }
+        return Optional.empty();
     }
 }

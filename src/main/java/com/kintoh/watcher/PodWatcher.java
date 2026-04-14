@@ -38,7 +38,15 @@ public class PodWatcher extends AbstractK8sWatcher {
                 if (item.object != null) {
                     K8sPodResource resource = new K8sPodResource(item.object);
                     Optional<Event> potentialEvent = monitor.check(resource);
-                    potentialEvent.ifPresent(event -> notifiers.forEach(notifier -> notifier.send(event)));
+
+                    potentialEvent.ifPresent(event -> {
+                        for (Notifier notifier : notifiers) {
+                            boolean entregado = notifier.send(event);
+                            if (!entregado) {
+                                System.err.println("ERROR: El notificador " + notifier.getClass().getSimpleName() + " no pudo entregar la alerta.");
+                            }
+                        }
+                    });
                 }
             }
         }

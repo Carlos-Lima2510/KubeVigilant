@@ -1,5 +1,5 @@
 package com.kintoh.domain;
 
 public interface Notifier {
-    void send(Event event);
+    boolean send(Event event);
 }

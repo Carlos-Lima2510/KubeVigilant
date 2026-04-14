@@ -38,7 +38,14 @@ public class NodeWatcher extends AbstractK8sWatcher {
                 if (item.object != null) {
                     K8sNodeResource resource = new K8sNodeResource(item.object);
                     Optional<Event> potentialEvent = monitor.check(resource);
-                    potentialEvent.ifPresent(event -> notifiers.forEach(notifier -> notifier.send(event)));
+                    potentialEvent.ifPresent(event -> {
+                        for (Notifier notifier : notifiers) {
+                            boolean entregado = notifier.send(event);
+                            if (!entregado) {
+                                System.err.println("ERROR: El notificador " + notifier.getClass().getSimpleName() + " no pudo entregar la alerta.");
+                            }
+                        }
+                    });
                 }
             }
         }
