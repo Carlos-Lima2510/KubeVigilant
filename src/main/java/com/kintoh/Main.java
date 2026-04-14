@@ -1,10 +1,10 @@
 package com.kintoh;
 
 import com.kintoh.core.K8sClientFactory;
+import com.kintoh.domain.Monitor;
 import com.kintoh.domain.Notifier;
 import com.kintoh.domain.Watcher;
-import com.kintoh.logic.NodeMonitor;
-import com.kintoh.logic.PodCrashMonitor;
+import com.kintoh.logic.GenericAnomalyMonitor;
 import com.kintoh.notifiers.ConsoleNotifier;
 import com.kintoh.notifiers.SlackNotifier;
 import com.kintoh.watcher.NodeWatcher;
@@ -19,21 +19,31 @@ public class Main {
 
         String slackWebHook = System.getenv("SLACK_WEBHOOK_URL");
 
+        List<Notifier> notifiers = null;
 
-        List<Notifier> notifiers = List.of(
-            new ConsoleNotifier(),
-            new SlackNotifier(slackWebHook));
+        try {
+            notifiers = List.of(
+                new ConsoleNotifier(),
+                new SlackNotifier(slackWebHook)
+            );
+        } catch (IllegalArgumentException e) {
+            System.err.println("FATAL: No se pudo arrancar el sistema. " + e.getMessage());
+            System.exit(1);
+        }
+
+        Monitor monitorUniversal = new GenericAnomalyMonitor();
 
         List<Watcher> watchers = List.of(
-            new PodWatcher(api, new PodCrashMonitor(), notifiers),
-            new NodeWatcher(api, new NodeMonitor(), notifiers)
+            new PodWatcher(api, monitorUniversal, notifiers),
+            new NodeWatcher(api, monitorUniversal, notifiers)
         );
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            System.out.println("Apagando todos los vigilantes...");
+            System.out.println("\nCerrando conexiones y apagando vigilantes...");
             watchers.forEach(Watcher::stop);
         }));
 
+        System.out.println("🛡️ Kintoh: Sistema de vigilancia iniciado.");
         watchers.forEach(Watcher::start);
     }
 }
