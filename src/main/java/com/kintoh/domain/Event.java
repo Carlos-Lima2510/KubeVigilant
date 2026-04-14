@@ -23,4 +23,6 @@ public class Event {
     public String reason() { return reason; }
     public Map<String, String> details() { return details; }
     public Resource resource() { return resource; }
+    public String resourceName() { return resource.name(); }
+    public String resourceNamespace() { return resource.namespace(); }
 }

@@ -6,11 +6,13 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.format.DateTimeFormatter;
 import java.util.stream.Collectors;
 
 public class SlackNotifier implements Notifier {
     private final String webHookUrl;
     private final HttpClient httpClient;
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public SlackNotifier(String webHookUrl) {
         if (webHookUrl == null || webHookUrl.isBlank()) {
@@ -26,11 +28,20 @@ public class SlackNotifier implements Notifier {
             String detalles = event.details().entrySet().stream()
                 .map(e -> e.getKey() + ": " + e.getValue())
                 .collect(Collectors.joining(", "));
-            
-            String recursoCompleto = event.resource().namespace() + "/" + event.resource().name();
-            
-            String mensaje = "🚨 ANOMALÍA: " + event.reason() + " en " + recursoCompleto + " | Info: " + detalles;
-            String jsonPayload = "{ \"text\": \"" + mensaje + "\" }";
+                
+            String infoLine = event.reason() + (detalles.isEmpty() ? "" : " | " + detalles);
+
+            String jsonPayload = """
+                {
+                    "text": "🚨 *[%s] DETECCIÓN DE ANOMALÍA*\\n• *Hora:* %s\\n• *Recurso:* %s\\n• *Ámbito:* %s\\n• *Info:* %s"
+                }
+                """.formatted(
+                    event.severity(),
+                    event.timestamp().format(FORMATTER),
+                    event.resourceName(),
+                    event.resourceNamespace(),
+                    infoLine
+                );
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(webHookUrl))
